@@ -1,6 +1,6 @@
-import { Home, Trophy, Brain, CreditCard, Users, Shield, Building2 } from 'lucide-react';
+import { Home, Trophy, Brain, CreditCard, MoreHorizontal } from 'lucide-react';
 
-export type TabId = 'mecz' | 'typer' | 'quiz' | 'karta' | 'druzyna' | 'panel';
+export type TabId = 'mecz' | 'typer' | 'quiz' | 'karta' | 'wiecej' | 'hala' | 'druzyna' | 'panel';
 
 interface Tab {
   id: TabId;
@@ -10,46 +10,45 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'mecz', label: 'Mecz', icon: Home },
-  { id: 'typer', label: 'Typer & MVP', icon: Trophy },
+  { id: 'typer', label: 'Typer', icon: Trophy },
   { id: 'quiz', label: 'Quizy', icon: Brain },
-  { id: 'karta', label: 'Karta Kibica', icon: CreditCard },
-  { id: 'druzyna', label: 'Drużyna', icon: Users },
-  { id: 'panel', label: 'Panel Klubu', icon: Shield },
-  { id: 'hala', label: 'Hala', icon: Building2 },
+  { id: 'karta', label: 'Karta', icon: CreditCard },
+  { id: 'wiecej', label: 'Więcej', icon: MoreHorizontal },
 ];
 
 interface Props {
   active: TabId;
-  onChange: (id: TabId) => void;
+  onChange: (tab: TabId) => void;
 }
 
 export function BottomNav({ active, onChange }: Props) {
+  const isMoreActive = active === 'wiecej' || active === 'hala' || active === 'druzyna' || active === 'panel';
+
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 pb-safe">
-      <div className="glass border-t border-white/10 backdrop-blur-xl">
-        <div className="flex items-center justify-around px-0.5 pt-1.5 pb-2">
-          {TABS.map(tab => {
-            const Icon = tab.icon;
-            const isActive = active === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onChange(tab.id)}
-                className="flex flex-col items-center gap-0.5 px-0.5 py-1 relative transition-all active:scale-90 min-w-0 flex-1"
-              >
-                <div className={`relative flex items-center justify-center transition-all ${isActive ? 'scale-110' : ''}`}>
-                  {isActive && <div className="absolute inset-0 bg-gold-400/20 rounded-xl blur-md" />}
-                  <Icon className={`w-5 h-5 relative transition-colors ${isActive ? 'text-gold-400' : 'text-gray-500'}`} strokeWidth={isActive ? 2.5 : 2} />
-                </div>
-                <span className={`text-[7.5px] font-medium uppercase tracking-tight transition-colors truncate w-full text-center ${isActive ? 'text-gold-400' : 'text-gray-500'}`}>
-                  {tab.label}
-                </span>
-                {isActive && <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-7 h-0.5 bg-gold-400 rounded-full" />}
-              </button>
-            );
-          })}
-        </div>
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 bg-navy-900/95 backdrop-blur-md border-t border-white/10 pb-safe">
+      <div className="grid grid-cols-5 h-16">
+        {TABS.map(({ id, label, icon: Icon }) => {
+          const isActive = id === 'wiecej' ? isMoreActive : active === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onChange(id)}
+              className={`relative flex flex-col items-center justify-center gap-1 transition-colors ${
+                isActive ? 'text-gold-400' : 'text-white/60 hover:text-white/90'
+              }`}
+            >
+              {isActive && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gold-400 rounded-full" />
+              )}
+              <Icon className="w-5 h-5" />
+              <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
+                {label}
+              </span>
+            </button>
+          );
+        })}
       </div>
-    </div>
+    </nav>
   );
 }

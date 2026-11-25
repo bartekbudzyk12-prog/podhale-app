@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Building2, Users, Shield, ChevronRight, ArrowLeft } from 'lucide-react';
 import { PointsProvider } from './lib/points';
 import { BottomNav, type TabId } from './components/BottomNav';
 import { PushBanner } from './components/PushBanner';
@@ -10,11 +11,74 @@ import { TeamScreen } from './screens/TeamScreen';
 import { AdminScreen } from './screens/AdminScreen';
 import { ClubHallSection } from './components/ClubHallSection';
 
+function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
+  const items: {
+    id: TabId;
+    title: string;
+    subtitle: string;
+    icon: typeof Building2;
+  }[] = [
+    {
+      id: 'hala',
+      title: 'Hala i Historia Klubu',
+      subtitle: 'Miejska Hala Lodowa, historia od 1932 r., legendy i FAQ',
+      icon: Building2,
+    },
+    {
+      id: 'druzyna',
+      title: 'Drużyna',
+      subtitle: 'Kadra zawodników i sztab Szarotek',
+      icon: Users,
+    },
+    {
+      id: 'panel',
+      title: 'Panel Klubu',
+      subtitle: 'Statystyki na żywo i powiadomienia push',
+      icon: Shield,
+    },
+  ];
+
+  return (
+    <div className="space-y-4 pb-24">
+      <div>
+        <h1 className="text-xl font-bold tracking-tight text-white">Więcej</h1>
+        <p className="text-xs text-white/60 mt-0.5">
+          Klub, hala lodowa, zespół i narzędzia klubowe
+        </p>
+      </div>
+
+      <div className="space-y-2.5">
+        {items.map(({ id, title, subtitle, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onSelect(id)}
+            className="w-full flex items-center justify-between gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
+          >
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-gold-400/15 border border-gold-400/30 flex items-center justify-center shrink-0 text-gold-400">
+                <Icon className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-semibold text-sm text-white truncate">{title}</div>
+                <div className="text-xs text-white/60 line-clamp-1">{subtitle}</div>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-white/40 shrink-0" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState<TabId>('mecz');
   const [push, setPush] = useState<string | null>(null);
 
   const dismissPush = useCallback(() => setPush(null), []);
+
+  const isSubScreen = tab === 'hala' || tab === 'druzyna' || tab === 'panel';
 
   return (
     <PointsProvider>
@@ -31,13 +95,25 @@ export default function App() {
           {/* Content */}
           <div className="relative">
             {push && <PushBanner text={push} onDismiss={dismissPush} />}
-            <div className="pt-safe px-3 pt-3">
+            <div className="pt-safe px-3 pt-3 pb-20">
+              {isSubScreen && (
+                <button
+                  type="button"
+                  onClick={() => setTab('wiecej')}
+                  className="mb-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-white/80 transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Wróć do menu Więcej
+                </button>
+              )}
+
               {tab === 'mecz' && <MatchScreen />}
               {tab === 'typer' && <FanZoneScreen />}
               {tab === 'quiz' && <QuizScreen />}
               {tab === 'karta' && <FanCardScreen />}
-              {tab === 'druzyna' && <TeamScreen />}
+              {tab === 'wiecej' && <MoreMenu onSelect={setTab} />}
               {tab === 'hala' && <ClubHallSection />}
+              {tab === 'druzyna' && <TeamScreen />}
               {tab === 'panel' && <AdminScreen pushHandler={setPush} />}
             </div>
           </div>

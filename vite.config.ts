@@ -10,6 +10,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    allowedHosts: ['sb-6bd2xm0pv7v2.vercel.run'],
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

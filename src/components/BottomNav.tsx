@@ -22,7 +22,12 @@ interface Props {
 }
 
 export function BottomNav({ active, onChange }: Props) {
-  const isMoreActive = active === 'wiecej' || active === 'hala' || active === 'druzyna' || active === 'panel';
+  const isMoreActive = const isMoreActive =
+  active === 'wiecej' ||
+  active === 'konto' ||
+  active === 'hala' ||
+  active === 'druzyna' ||
+  active === 'panel';
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 bg-navy-900/95 backdrop-blur-md border-t border-white/10 pb-safe">

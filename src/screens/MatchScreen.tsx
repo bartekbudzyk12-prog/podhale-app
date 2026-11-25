@@ -4,6 +4,7 @@ import { Logo } from '@/components/Logo';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { MatchLineupView } from '@/components/MatchLineupView';
+import { readLiveScore, type LiveScoreState } from '@/screens/AdminScreen';
 import { NEWS, FIXTURES, RESULTS, STANDINGS, TICKET_URL, type Fixture } from '@/lib/data';
 
 const MATCH_DURATION_MS = 3 * 60 * 60 * 1000; // okno trwania meczu: 3h od godziny rozpoczęcia
@@ -93,15 +94,39 @@ function useActiveMatch(fixtures: Fixture[]) {
   }, [fixtures, now]);
 }
 
-export function MatchScreen() {
+interface MatchScreenProps {
+  liveScore?: LiveScoreState;
+}
+
+export function MatchScreen({ liveScore: propLiveScore }: MatchScreenProps) {
   const { fixture, roundNumber, isLive, elapsedMinutes, countdown } = useActiveMatch(FIXTURES);
   const { d, h, m, s } = countdown;
 
+  const [localLiveScore, setLocalLiveScore] = useState<LiveScoreState>(() => readLiveScore());
   const [lineupOpen, setLineupOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
   const [standingsOpen, setStandingsOpen] = useState(false);
 
+  useEffect(() => {
+    const syncScore = (e: Event) => {
+      const custom = e as CustomEvent<LiveScoreState>;
+      if (custom.detail) {
+        setLocalLiveScore(custom.detail);
+      } else {
+        setLocalLiveScore(readLiveScore());
+      }
+    };
+    window.addEventListener('podhale-live-score-change', syncScore);
+    window.addEventListener('storage', syncScore);
+    return () => {
+      window.removeEventListener('podhale-live-score-change', syncScore);
+      window.removeEventListener('storage', syncScore);
+    };
+  }, []);
+
+  const activeLiveScore = propLiveScore ?? localLiveScore;
+  const showLiveScore = Boolean(activeLiveScore?.active);
   const opponentShort = getTeamShort(fixture.opponent);
   const venueLabel = fixture.isHome ? 'Miejska Hala Lodowa, Nowy Targ' : `Wyjazd • ${fixture.opponent}`;
   const timeLabel = fixture.time && fixture.time !== '—' ? `${fixture.date} - ${fixture.time}` : fixture.date;
@@ -142,9 +167,20 @@ export function MatchScreen() {
               <p className="font-display text-sm uppercase text-white">Podhale</p>
               <p className="text-[10px] text-gray-400">Nowy Targ</p>
             </div>
-            <div className="px-3">
-              <p className="font-display text-2xl text-gold-400">VS</p>
-              <p className="text-[9px] text-gray-500 uppercase mt-1">{isLive ? 'LIVE' : 'ZA CHWILE'}</p>
+            <div className="px-3 text-center">
+              {showLiveScore ? (
+                <>
+                  <p className="font-display text-3xl tabular text-white">
+                    {activeLiveScore.homeScore} <span className="text-gold-400">:</span> {activeLiveScore.awayScore}
+                  </p>
+                  <p className="text-[9px] text-red-300 uppercase mt-1 font-semibold">{activeLiveScore.period}</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-display text-2xl text-gold-400">VS</p>
+                  <p className="text-[9px] text-gray-500 uppercase mt-1">{isLive ? 'LIVE' : 'ZA CHWILE'}</p>
+                </>
+              )}
             </div>
             <div className="flex-1 text-center">
               <div className="w-16 h-16 mx-auto rounded-2xl glass border-red-400/20 flex items-center justify-center mb-2">
@@ -159,7 +195,14 @@ export function MatchScreen() {
             <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider flex items-center justify-center gap-1">
               <MapPin className="w-3 h-3 text-gold-400" /> {venueLabel}
             </p>
-            {!isLive ? (
+            {showLiveScore ? (
+              <div className="space-y-1">
+                <p className="text-lg font-display text-red-400 uppercase">{activeLiveScore.period}</p>
+                <p className="text-[11px] text-gray-300 tabular">
+                  Wynik na żywo • Podhale {activeLiveScore.homeScore} : {activeLiveScore.awayScore} {fixture.opponent}
+                </p>
+              </div>
+            ) : !isLive ? (
               <div className="flex items-center justify-center gap-2 tabular">
                 {[
                   { v: d, l: 'dni' },
@@ -344,5 +387,7 @@ export function MatchScreen() {
         <MatchLineupView />
       </Modal>
     </div>
+  );
+}
   );
 }

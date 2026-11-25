@@ -1,4 +1,4 @@
-import { Home, Trophy, CreditCard, Users, Shield, Brain } from 'lucide-react';
+import { Home, Trophy, Brain, CreditCard, Users, Shield, Building2 } from 'lucide-react';
 
 export type TabId = 'mecz' | 'typer' | 'quiz' | 'karta' | 'druzyna' | 'panel';
 

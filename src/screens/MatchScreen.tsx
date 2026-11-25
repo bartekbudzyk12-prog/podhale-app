@@ -7,7 +7,7 @@ import { MatchLineupView } from '@/components/MatchLineupView';
 import { readLiveScore, type LiveScoreState } from '@/screens/AdminScreen';
 import { NEWS, FIXTURES, RESULTS, STANDINGS, TICKET_URL, type Fixture } from '@/lib/data';
 
-const MATCH_DURATION_MS = 3 * 60 * 60 * 1000; // okno trwania meczu: 3h od godziny rozpoczęcia
+const MATCH_DURATION_MS = 3 * 60 * 60 * 1000;
 
 function parseFixtureDate(fixture: Fixture): Date | null {
   const [dayStr, monthStr] = fixture.date.split('.');
@@ -15,7 +15,6 @@ function parseFixtureDate(fixture: Fixture): Date | null {
   const month = Number(monthStr);
   if (!day || !month) return null;
 
-  // Sezon 2026/27: miesiące 8-12 to 2026, 1-7 to 2027
   const year = month >= 8 ? 2026 : 2027;
 
   let hours = 18;
@@ -57,7 +56,6 @@ function useActiveMatch(fixtures: Fixture[]) {
       }))
       .filter((item): item is { fixture: Fixture; index: number; startDate: Date } => item.startDate !== null);
 
-    // Najpierw szukamy meczu, który właśnie trwa (start <= now <= start + 3h)
     const liveMatch = scheduled.find(
       item => now >= item.startDate.getTime() && now <= item.startDate.getTime() + MATCH_DURATION_MS,
     );
@@ -74,7 +72,6 @@ function useActiveMatch(fixtures: Fixture[]) {
       };
     }
 
-    // W przeciwnym razie bierzemy najbliższy nadchodzący mecz
     const upcoming = scheduled.find(item => item.startDate.getTime() > now) || scheduled[scheduled.length - 1];
     const diff = Math.max(0, upcoming.startDate.getTime() - now);
 
@@ -273,121 +270,4 @@ export function MatchScreen({ liveScore: propLiveScore }: MatchScreenProps) {
           <ChevronRight className="w-4 h-4 text-gray-500" />
         </div>
         <div className="space-y-2.5">
-          {NEWS.map((n, i) => (
-            <div key={i} className="glass rounded-2xl p-3.5 active:scale-[0.98] transition-transform cursor-pointer">
-              <div className="flex items-start gap-3">
-                <div className={`shrink-0 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${n.tagColor === 'gold' ? 'bg-gold-400/15 text-gold-300 border-gold-400/30' : 'bg-red-400/15 text-red-200 border-red-400/30'}`}>
-                  {n.tag}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-gray-100 leading-snug">{n.text}</p>
-                  <p className="text-[10px] text-gray-500 mt-1.5 flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> {n.time}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Schedule Modal */}
-      <Modal open={scheduleOpen} onClose={() => setScheduleOpen(false)} title="Terminarz 2026/27">
-        <div className="p-3 space-y-2">
-          {FIXTURES.map((f) => {
-            const isCurrent = f.id === fixture.id;
-            return (
-              <div key={f.id} className={`glass rounded-xl p-3 flex items-center gap-3 ${isCurrent ? 'ring-1 ring-gold-400/40' : ''}`}>
-                <div className="text-center shrink-0 w-12">
-                  <p className="text-[11px] font-bold text-gold-400 tabular">{f.date}</p>
-                  {f.time !== '-' && f.time !== '—' && <p className="text-[9px] text-gray-500 tabular">{f.time}</p>}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] text-white truncate">
-                    <span className={f.isHome ? 'font-semibold' : 'text-gray-300'}>{f.home}</span>
-                    <span className="text-gray-500 mx-1.5">-</span>
-                    <span className={!f.isHome ? 'font-semibold' : 'text-gray-300'}>{f.away}</span>
-                  </p>
-                  <p className="text-[9px] text-gray-500 mt-0.5">
-                    {f.isHome ? 'Dom' : 'Wyjazd'} {isCurrent ? '| Najbliższy mecz' : ''}
-                  </p>
-                </div>
-                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${f.isHome ? 'bg-gold-400/15 text-gold-300' : 'bg-navy-400/15 text-navy-100'}`}>
-                  {f.isHome ? 'DOM' : 'WYJ'}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
-
-      {/* Results Modal */}
-      <Modal open={resultsOpen} onClose={() => setResultsOpen(false)} title="Wyniki - Ostatnie mecze">
-        <div className="p-3 space-y-2">
-          {RESULTS.map((r) => {
-            const isPodhaleHome = r.home === 'Podhale';
-            const podhaleScore = isPodhaleHome ? r.homeScore : r.awayScore;
-            const oppScore = isPodhaleHome ? r.awayScore : r.homeScore;
-            return (
-              <div key={r.id} className="glass rounded-xl p-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] text-gray-500 tabular">{r.date} | {r.time}</span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-400/15 text-red-300 font-bold uppercase">P</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 text-right">
-                    <p className={`text-[13px] ${isPodhaleHome ? 'text-gold-400 font-semibold' : 'text-gray-300'}`}>{r.home}</p>
-                  </div>
-                  <div className="px-3 flex items-center gap-1.5">
-                    <span className={`text-lg font-display tabular ${podhaleScore > oppScore ? 'text-green-400' : podhaleScore < oppScore ? 'text-red-300' : 'text-white'}`}>{r.homeScore}</span>
-                    <span className="text-gray-600 text-sm">:</span>
-                    <span className={`text-lg font-display tabular ${podhaleScore < oppScore ? 'text-green-400' : podhaleScore > oppScore ? 'text-red-300' : 'text-white'}`}>{r.awayScore}</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className={`text-[13px] ${!isPodhaleHome ? 'text-gold-400 font-semibold' : 'text-gray-300'}`}>{r.away}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
-
-      {/* Standings Modal */}
-      <Modal open={standingsOpen} onClose={() => setStandingsOpen(false)} title="Tabela THL 2026/27">
-        <div className="p-3">
-          <div className="glass rounded-xl overflow-hidden">
-            <div className="grid grid-cols-[24px_1fr_28px_28px_28px_52px_36px] gap-1 px-2.5 py-2 text-[8px] uppercase tracking-wider text-gray-500 font-semibold border-b border-white/5">
-              <span>#</span>
-              <span>Druzyna</span>
-              <span className="text-center">M</span>
-              <span className="text-center">W</span>
-              <span className="text-center">P</span>
-              <span className="text-center">Bramki</span>
-              <span className="text-center">Pkt</span>
-            </div>
-            {STANDINGS.map(row => (
-              <div
-                key={row.pos}
-                className={`grid grid-cols-[24px_1fr_28px_28px_28px_52px_36px] gap-1 px-2.5 py-2.5 items-center text-[11px] border-b border-white/5 ${row.isPodhale ? 'bg-gold-400/10' : ''}`}
-              >
-                <span className={`font-bold tabular ${row.isPodhale ? 'text-gold-400' : 'text-gray-400'}`}>{row.pos}</span>
-                <span className={`truncate ${row.isPodhale ? 'text-gold-300 font-semibold' : 'text-gray-200'}`}>{row.team}</span>
-                <span className="text-center text-gray-400 tabular">{row.m}</span>
-                <span className="text-center text-gray-400 tabular">{row.w}</span>
-                <span className="text-center text-gray-400 tabular">{row.p}</span>
-                <span className="text-center text-gray-500 tabular text-[10px]">{row.goals}</span>
-                <span className={`text-center font-bold tabular ${row.isPodhale ? 'text-gold-400' : 'text-white'}`}>{row.pts}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Modal>
-
-      {/* Match Lineup Modal */}
-      <Modal open={lineupOpen} onClose={() => setLineupOpen(false)} title="SKŁAD NA MECZ">
-        <MatchLineupView />
-      </Modal>
-    </div>
-  );
-}
-  );
-}
+          {NEWS.

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Building2, Users, Shield, ChevronRight, ArrowLeft } from 'lucide-react';
+import { User, Building2, Users, Shield, ChevronRight, ArrowLeft } from 'lucide-react';
 import { PointsProvider } from './lib/points';
 import { BottomNav, type TabId } from './components/BottomNav';
 import { PushBanner } from './components/PushBanner';
@@ -10,14 +10,21 @@ import { FanCardScreen } from './screens/FanCardScreen';
 import { TeamScreen } from './screens/TeamScreen';
 import { AdminScreen } from './screens/AdminScreen';
 import { ClubHallSection } from './components/ClubHallSection';
+import { AccountSection } from './components/AccountSection';
 
 function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
   const items: {
     id: TabId;
     title: string;
     subtitle: string;
-    icon: typeof Building2;
+    icon: typeof User;
   }[] = [
+    {
+      id: 'konto',
+      title: 'Moje konto',
+      subtitle: 'Rejestracja, logowanie, punkty i zgody RODO',
+      icon: User,
+    },
     {
       id: 'hala',
       title: 'Hala i Historia Klubu',
@@ -43,7 +50,7 @@ function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
       <div>
         <h1 className="text-xl font-bold tracking-tight text-white">Więcej</h1>
         <p className="text-xs text-white/60 mt-0.5">
-          Klub, hala lodowa, zespół i narzędzia klubowe
+          Konto kibica, hala lodowa, zespół i narzędzia klubowe
         </p>
       </div>
 
@@ -78,7 +85,8 @@ export default function App() {
 
   const dismissPush = useCallback(() => setPush(null), []);
 
-  const isSubScreen = tab === 'hala' || tab === 'druzyna' || tab === 'panel';
+  const isSubScreen =
+    tab === 'konto' || tab === 'hala' || tab === 'druzyna' || tab === 'panel';
 
   return (
     <PointsProvider>
@@ -112,6 +120,7 @@ export default function App() {
               {tab === 'quiz' && <QuizScreen />}
               {tab === 'karta' && <FanCardScreen />}
               {tab === 'wiecej' && <MoreMenu onSelect={setTab} />}
+              {tab === 'konto' && <AccountSection />}
               {tab === 'hala' && <ClubHallSection />}
               {tab === 'druzyna' && <TeamScreen />}
               {tab === 'panel' && <AdminScreen pushHandler={setPush} />}

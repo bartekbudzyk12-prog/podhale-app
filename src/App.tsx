@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { User, Building2, Users, Shield, ChevronRight, ArrowLeft, BarChart3 } from 'lucide-react';
+import { User, Building2, Users, Shield, ChevronRight, ArrowLeft, BarChart3, Share2 } from 'lucide-react';
 import { StatsScreen } from './screens/StatsScreen';
+import { SocialMediaScreen } from './screens/SocialMediaScreen';
 import { PointsProvider } from './lib/points';
 import { BottomNav, type TabId } from './components/BottomNav';
 import { PushBanner } from './components/PushBanner';
@@ -43,6 +44,12 @@ function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
       title: 'Statystyki',
       subtitle: 'Gole, asysty, punkty, kary i +/- zawodników',
       icon: BarChart3,
+    },
+    {
+      id: 'social',
+      title: 'Social Media',
+      subtitle: 'Facebook, Instagram, YouTube, TikTok i strona klubu',
+      icon: Share2,
     },
     {
       id: 'panel',
@@ -93,7 +100,7 @@ export default function App() {
   const dismissPush = useCallback(() => setPush(null), []);
 
   const isSubScreen =
-    tab === 'konto' || tab === 'hala' || tab === 'druzyna' || tab === 'statystyki' || tab === 'panel';
+    tab === 'konto' || tab === 'hala' || tab === 'druzyna' || tab === 'statystyki' || tab === 'social' || tab === 'panel';
 
   return (
     <PointsProvider>
@@ -131,6 +138,7 @@ export default function App() {
               {tab === 'hala' && <ClubHallSection />}
               {tab === 'druzyna' && <TeamScreen />}
               {tab === 'statystyki' && <StatsScreen />}
+              {tab === 'social' && <SocialMediaScreen />}
               {tab === 'panel' && <AdminScreen pushHandler={setPush} />}
             </div>
           </div>

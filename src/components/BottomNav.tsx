@@ -10,6 +10,7 @@ export type TabId =
   | 'hala'
   | 'druzyna'
   | 'statystyki'
+  | 'social'
   | 'panel';
 
 interface Tab {
@@ -37,6 +38,8 @@ export function BottomNav({ active, onChange }: Props) {
     active === 'konto' ||
     active === 'hala' ||
     active === 'druzyna' ||
+    active === 'statystyki' ||
+    active === 'social' ||
     active === 'panel';
 
   return (

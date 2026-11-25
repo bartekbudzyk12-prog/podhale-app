@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { Ticket, Radio, Flame, Zap, Clock, Calendar, Trophy, TrendingUp, ChevronRight, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Ticket, ClipboardList, Radio, Zap, Clock, Calendar, Trophy, TrendingUp, ChevronRight, MapPin } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
+import { MatchLineupView } from '@/components/MatchLineupView';
 import { NEWS, FIXTURES, RESULTS, STANDINGS, TICKET_URL } from '@/lib/data';
 
 const NEXT_MATCH_DATE = new Date('2026-11-27T18:00:00+01:00');
@@ -21,49 +22,12 @@ function useCountdown(target: Date) {
   return { d, h, m, s, done: diff <= 0 };
 }
 
-const FLASH_COLORS = ['flash-navy', 'flash-gold', 'flash-red'];
-
 export function MatchScreen() {
   const { d, h, m, s, done } = useCountdown(NEXT_MATCH_DATE);
-  const [stadiumOpen, setStadiumOpen] = useState(false);
+  const [lineupOpen, setLineupOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
   const [standingsOpen, setStandingsOpen] = useState(false);
-  const [flashIdx, setFlashIdx] = useState(0);
-  const [lightOn, setLightOn] = useState(false);
-  const [shotsP, setShotsP] = useState(8);
-  const [shotsT, setShotsT] = useState(14);
-  const [ppActive, setPpActive] = useState(true);
-  const [ppSec, setPpSec] = useState(47);
-  const flashInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    if (!lightOn) return;
-    flashInterval.current = setInterval(() => {
-      setFlashIdx(i => (i + 1) % FLASH_COLORS.length);
-    }, 350);
-    return () => { if (flashInterval.current) clearInterval(flashInterval.current); };
-  }, [lightOn]);
-
-  useEffect(() => {
-    if (!stadiumOpen) return;
-    const t = setInterval(() => {
-      setShotsP(v => v + (Math.random() > 0.7 ? 1 : 0));
-      setShotsT(v => v + (Math.random() > 0.55 ? 1 : 0));
-    }, 4000);
-    return () => clearInterval(t);
-  }, [stadiumOpen]);
-
-  useEffect(() => {
-    if (!stadiumOpen || !ppActive) return;
-    const t = setInterval(() => {
-      setPpSec(v => {
-        if (v <= 1) { setPpActive(false); return 0; }
-        return v - 1;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, [stadiumOpen, ppActive]);
 
   return (
     <div className="px-4 pt-3 pb-28 space-y-4">
@@ -143,10 +107,11 @@ export function MatchScreen() {
               <Ticket className="w-4 h-4" /> KUP BILET
             </a>
             <button
-              onClick={() => setStadiumOpen(true)}
-              className="flex items-center justify-center gap-2 bg-red-400 hover:bg-red-300 text-white font-bold py-3 rounded-xl transition-all active:scale-95 animate-pulse-red"
+              type="button"
+              onClick={() => setLineupOpen(true)}
+              className="flex items-center justify-center gap-2 bg-red-400 hover:bg-red-300 text-white font-bold py-3 rounded-xl transition-all active:scale-95"
             >
-              <Radio className="w-4 h-4" /> TRYB HALI (LIVE)
+              <ClipboardList className="w-4 h-4" aria-hidden="true" /> SKŁAD NA MECZ
             </button>
           </div>
         </div>
@@ -283,70 +248,9 @@ export function MatchScreen() {
         </div>
       </Modal>
 
-      {/* Stadium Mode Modal */}
-      <Modal open={stadiumOpen} onClose={() => { setStadiumOpen(false); setLightOn(false); }} title="TRYB HALI - LIVE">
-        <div className={`p-5 transition-colors duration-300 ${lightOn ? `animate-${FLASH_COLORS[flashIdx]}` : ''}`}>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Podhale vs Polonia Bytom</p>
-              <p className="font-display text-xl text-white">1 : 3 <span className="text-xs text-gray-500">2. tercja</span></p>
-            </div>
-            <span className="px-2 py-1 bg-red-400 text-white text-[10px] font-bold rounded animate-pulse flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> LIVE
-            </span>
-          </div>
-
-          <button
-            onClick={() => setLightOn(v => !v)}
-            className={`w-full py-4 rounded-2xl font-display text-lg uppercase tracking-wider transition-all active:scale-95 ${lightOn ? 'bg-white text-navy-900 animate-chant' : 'bg-gradient-to-r from-navy-600 to-gold-500 text-white'}`}
-          >
-            {lightOn ? 'SWIATLA NA LOD!' : 'Swiatla na lod!'}
-          </button>
-          {lightOn && (
-            <p className="text-center text-[11px] text-gold-400 mt-2 animate-pulse">SZAROTKI! SZAROTKI! SZAROTKI!</p>
-          )}
-
-          <div className="grid grid-cols-2 gap-3 mt-5">
-            <div className="glass rounded-xl p-3">
-              <p className="text-[9px] text-gray-400 uppercase tracking-wider mb-1">Strzaly na bramke</p>
-              <div className="flex items-center justify-between">
-                <div className="text-center">
-                  <p className="text-2xl font-bold tabular text-gold-400">{shotsP}</p>
-                  <p className="text-[8px] text-gray-500">PODHALE</p>
-                </div>
-                <span className="text-gray-600">:</span>
-                <div className="text-center">
-                  <p className="text-2xl font-bold tabular text-red-300">{shotsT}</p>
-                  <p className="text-[8px] text-gray-500">POLONIA</p>
-                </div>
-              </div>
-            </div>
-            <div className="glass rounded-xl p-3">
-              <p className="text-[9px] text-gray-400 uppercase tracking-wider mb-1">Powerplay</p>
-              {ppActive ? (
-                <div className="text-center">
-                  <p className="text-2xl font-bold tabular text-gold-400">{Math.floor(ppSec/60)}:{String(ppSec%60).padStart(2,'0')}</p>
-                  <p className="text-[8px] text-gray-500">PODHALE PP</p>
-                  <div className="h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-gold-400 transition-all duration-1000" style={{ width: `${(ppSec/120)*100}%` }} />
-                  </div>
-                </div>
-              ) : (
-                <p className="text-center text-sm text-gray-500 py-3">Brak przewagi</p>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-4 glass rounded-xl p-3">
-            <div className="flex items-center justify-between text-[10px] text-gray-400 mb-2">
-              <span>2. TERCJA</span>
-              <span className="tabular">12:34</span>
-            </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-gold-400 to-red-400" style={{ width: '62%' }} />
-            </div>
-          </div>
-        </div>
+      {/* Match Lineup Modal */}
+      <Modal open={lineupOpen} onClose={() => setLineupOpen(false)} title="SKŁAD NA MECZ">
+        <MatchLineupView />
       </Modal>
     </div>
   );

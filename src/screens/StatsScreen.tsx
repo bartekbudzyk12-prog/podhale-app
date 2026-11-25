@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, BookOpen, ChevronDown } from 'lucide-react';
-import { PLAYER_STATS, type PlayerStatRow, type PositionGroup } from '../lib/playerStats';
+import { PLAYER_STATS, STATS_SOURCE, type PlayerStatRow, type PositionGroup } from '../lib/playerStats';
 
 type SortKey = 'name' | 'position' | 'matches' | 'goals' | 'assists' | 'points' | 'pim' | 'plusMinus';
 type SortDir = 'asc' | 'desc';
@@ -105,7 +105,14 @@ export function StatsScreen() {
       <div>
         <h1 className="text-xl font-bold tracking-tight text-white">Statystyki</h1>
         <p className="text-xs text-white/60 mt-0.5">
-          Statystyki zawodników Podhala Nowy Targ, sezon 2026/27
+          Statystyki zawodników Podhala Nowy Targ, {STATS_SOURCE.season}
+        </p>
+        <p className="text-[10px] text-white/40 mt-1">
+          Źródło:{' '}
+          <a href={STATS_SOURCE.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-gold-400">
+            {STATS_SOURCE.label}
+          </a>
+          , stan na {STATS_SOURCE.updatedAt}
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-import { ClubHallSection } from './components/ClubHallSection';
+import React, { useState } from 'react';
 import {
   MapPin,
   Navigation,

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import {
   UserCheck,
   LogIn,
@@ -11,29 +11,23 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { usePoints } from '../lib/points';
+import { supabase } from '../lib/supabase';
 
 interface FanProfile {
+  id: string;
   name: string;
   email: string;
   favoriteSector: string;
+  points: number;
   marketingConsent: boolean;
   termsAcceptedAt: string;
 }
 
-const STORAGE_KEY = 'podhale_fan_profile_v1';
-
-function loadSavedProfile(): FanProfile | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as FanProfile) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function AccountSection() {
   const { points } = usePoints();
-  const [profile, setProfile] = useState<FanProfile | null>(() => loadSavedProfile());
+  const [profile, setProfile] = useState<FanProfile | null>(null);
+  const [loadingSession, setLoadingSession] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<'register' | 'login'>('register');
 
   const [name, setName] = useState('');
@@ -45,7 +39,80 @@ export function AccountSection() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const loadUserProfile = async (userId: string, fallbackEmail = '', fallbackName = '') => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, display_name, email, favorite_sector, points, marketing_consent, terms_accepted_at')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error) {
+      setErrorMsg('Nie udało się pobrać profilu z bazy: ' + error.message);
+      return;
+    }
+
+    if (data) {
+      setProfile({
+        id: data.id,
+        name: data.display_name,
+        email: data.email,
+        favoriteSector: data.favorite_sector,
+        points: data.points ?? points,
+        marketingConsent: Boolean(data.marketing_consent),
+        termsAcceptedAt: data.terms_accepted_at,
+      });
+    } else if (fallbackEmail) {
+      setProfile({
+        id: userId,
+        name: fallbackName || fallbackEmail.split('@')[0] || 'Kibic Szarotek',
+        email: fallbackEmail,
+        favoriteSector: 'Sektor A — Młyn',
+        points,
+        marketingConsent: false,
+        termsAcceptedAt: new Date().toISOString(),
+      });
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      if (data.session?.user) {
+        await loadUserProfile(
+          data.session.user.id,
+          data.session.user.email || '',
+          (data.session.user.user_metadata?.display_name as string) || ''
+        );
+      }
+      if (active) setLoadingSession(false);
+    };
+
+    init();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!active) return;
+      if (session?.user) {
+        await loadUserProfile(
+          session.user.id,
+          session.user.email || '',
+          (session.user.user_metadata?.display_name as string) || ''
+        );
+      } else {
+        setProfile(null);
+      }
+      setLoadingSession(false);
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setInfoMsg(null);
@@ -68,52 +135,114 @@ export function AccountSection() {
       return;
     }
 
-    const existing = loadSavedProfile();
-    const nextProfile: FanProfile =
-      mode === 'login' && existing && existing.email.toLowerCase() === cleanEmail.toLowerCase()
-        ? existing
-        : {
-            name: cleanName,
-            email: cleanEmail,
-            favoriteSector,
-            marketingConsent,
-            termsAcceptedAt: existing?.termsAcceptedAt || new Date().toISOString(),
-          };
+    setSubmitting(true);
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextProfile));
-    } catch {
-      // ignorujemy błąd pamięci lokalnej w trybie prywatnym
-    }
+      if (mode === 'register') {
+        const nowIso = new Date().toISOString();
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password,
+          options: {
+            data: {
+              display_name: cleanName,
+            },
+          },
+        });
 
-    setProfile(nextProfile);
-    setPassword('');
-    setInfoMsg(
-      mode === 'register'
-        ? 'Konto kibica zostało utworzone i zgody zostały zapisane.'
-        : 'Zalogowano pomyślnie.'
-    );
+        if (error) {
+          setErrorMsg(error.message);
+          return;
+        }
+
+        const user = data.user;
+        if (user) {
+          if (data.session) {
+            const { error: profileError } = await supabase.from('profiles').upsert({
+              id: user.id,
+              display_name: cleanName,
+              email: cleanEmail,
+              favorite_sector: favoriteSector,
+              points,
+              marketing_consent: marketingConsent,
+              terms_accepted_at: nowIso,
+              updated_at: nowIso,
+            });
+
+            if (profileError) {
+              setErrorMsg('Konto założono, ale zapis profilu nie powiódł się: ' + profileError.message);
+              return;
+            }
+
+            await loadUserProfile(user.id, cleanEmail, cleanName);
+            setInfoMsg('Konto kibica zostało utworzone i zapisane w bazie!');
+          } else {
+            setInfoMsg(
+              'Konto utworzone! Sprawdź skrzynkę e-mail i kliknij link potwierdzający (lub wyłącz Confirm email w Supabase na czas testów).'
+            );
+          }
+        }
+        setPassword('');
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
+
+        if (error) {
+          setErrorMsg('Nie udało się zalogować: ' + error.message);
+          return;
+        }
+
+        if (data.user) {
+          await loadUserProfile(data.user.id, data.user.email || cleanEmail);
+          setInfoMsg('Zalogowano pomyślnie.');
+        }
+        setPassword('');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleToggleMarketing = () => {
+  const handleToggleMarketing = async () => {
     if (!profile) return;
-    const updated: FanProfile = {
-      ...profile,
-      marketingConsent: !profile.marketingConsent,
-    };
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {
-      // ignorujemy błąd pamięci lokalnej
+    setErrorMsg(null);
+    setInfoMsg(null);
+
+    const nextConsent = !profile.marketingConsent;
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        marketing_consent: nextConsent,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', profile.id);
+
+    if (error) {
+      setErrorMsg('Nie udało się zapisać zmiany zgody: ' + error.message);
+      return;
     }
-    setProfile(updated);
-    setInfoMsg('Zaktualizowano ustawienia zgody marketingowej.');
+
+    setProfile({ ...profile, marketingConsent: nextConsent });
+    setInfoMsg('Zaktualizowano zgodę marketingową w bazie.');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setErrorMsg(null);
+    setInfoMsg(null);
+    await supabase.auth.signOut();
     setProfile(null);
     setInfoMsg('Wylogowano z konta.');
   };
+
+  if (loadingSession) {
+    return (
+      <div className="py-12 text-center text-xs text-white/60">
+        Sprawdzanie sesji konta kibica...
+      </div>
+    );
+  }
 
   if (profile) {
     return (
@@ -163,6 +292,12 @@ export function AccountSection() {
           </div>
         )}
 
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-red-500/15 border border-red-400/30 text-xs text-red-200">
+            {errorMsg}
+          </div>
+        )}
+
         <div className="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-gold-400" />
@@ -174,7 +309,7 @@ export function AccountSection() {
             <span className="text-white/90 font-medium">
               {new Date(profile.termsAcceptedAt).toLocaleDateString('pl-PL')}
             </span>
-            . W każdej chwili możesz zmienić zgodę komunikacyjną lub poprosić o usunięcie konta.
+            . W każdej chwili możesz zmienić zgodę komunikacyjną.
           </p>
 
           <label className="flex items-start justify-between gap-3 pt-2 border-t border-white/10 cursor-pointer">
@@ -356,9 +491,14 @@ export function AccountSection() {
 
         <button
           type="submit"
-          className="w-full py-3 rounded-xl bg-gold-400 hover:bg-gold-300 text-navy-900 font-bold text-sm transition-colors"
+          disabled={submitting}
+          className="w-full py-3 rounded-xl bg-gold-400 hover:bg-gold-300 disabled:opacity-60 text-navy-900 font-bold text-sm transition-colors"
         >
-          {mode === 'register' ? 'Załóż konto kibica' : 'Zaloguj się'}
+          {submitting
+            ? 'Przetwarzanie...'
+            : mode === 'register'
+              ? 'Załóż konto kibica'
+              : 'Zaloguj się'}
         </button>
       </form>
     </div>

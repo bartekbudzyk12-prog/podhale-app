@@ -1,33 +1,110 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Ticket, ClipboardList, Radio, Zap, Clock, Calendar, Trophy, TrendingUp, ChevronRight, MapPin } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { MatchLineupView } from '@/components/MatchLineupView';
-import { NEWS, FIXTURES, RESULTS, STANDINGS, TICKET_URL } from '@/lib/data';
+import { NEWS, FIXTURES, RESULTS, STANDINGS, TICKET_URL, type Fixture } from '@/lib/data';
 
-const NEXT_MATCH_DATE = new Date('2026-11-27T18:00:00+01:00');
+const MATCH_DURATION_MS = 3 * 60 * 60 * 1000; // okno trwania meczu: 3h od godziny rozpoczęcia
 
-function useCountdown(target: Date) {
-  const [diff, setDiff] = useState(target.getTime() - Date.now());
+function parseFixtureDate(fixture: Fixture): Date | null {
+  const [dayStr, monthStr] = fixture.date.split('.');
+  const day = Number(dayStr);
+  const month = Number(monthStr);
+  if (!day || !month) return null;
+
+  // Sezon 2026/27: miesiące 8-12 to 2026, 1-7 to 2027
+  const year = month >= 8 ? 2026 : 2027;
+
+  let hours = 18;
+  let minutes = 0;
+  if (fixture.time && fixture.time !== '—' && fixture.time !== '-') {
+    const [hStr, mStr] = fixture.time.split(':');
+    const hNum = Number(hStr);
+    const mNum = Number(mStr);
+    if (!Number.isNaN(hNum)) hours = hNum;
+    if (!Number.isNaN(mNum)) minutes = mNum;
+  }
+
+  return new Date(year, month - 1, day, hours, minutes, 0, 0);
+}
+
+function getTeamShort(teamName: string): string {
+  const clean = teamName.replace(/\b(KS|BS|ECZD|JKH|GKS|KH|STS|Comarch|Unia)\b/gi, '').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return clean.slice(0, 2).toUpperCase() || 'RYW';
+}
+
+function useActiveMatch(fixtures: Fixture[]) {
+  const [now, setNow] = useState(() => Date.now());
+
   useEffect(() => {
-    const t = setInterval(() => setDiff(target.getTime() - Date.now()), 1000);
+    const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
-  }, [target]);
-  const clamped = Math.max(0, diff);
-  const d = Math.floor(clamped / 86400000);
-  const h = Math.floor((clamped % 86400000) / 3600000);
-  const m = Math.floor((clamped % 3600000) / 60000);
-  const s = Math.floor((clamped % 60000) / 1000);
-  return { d, h, m, s, done: diff <= 0 };
+  }, []);
+
+  return useMemo(() => {
+    const scheduled = fixtures
+      .map((fixture, index) => ({
+        fixture,
+        index,
+        startDate: parseFixtureDate(fixture),
+      }))
+      .filter((item): item is { fixture: Fixture; index: number; startDate: Date } => item.startDate !== null);
+
+    // Najpierw szukamy meczu, który właśnie trwa (start <= now <= start + 3h)
+    const liveMatch = scheduled.find(
+      item => now >= item.startDate.getTime() && now <= item.startDate.getTime() + MATCH_DURATION_MS,
+    );
+
+    if (liveMatch) {
+      const elapsedMinutes = Math.max(1, Math.floor((now - liveMatch.startDate.getTime()) / 60000));
+      return {
+        fixture: liveMatch.fixture,
+        roundNumber: 22 + liveMatch.index,
+        startDate: liveMatch.startDate,
+        isLive: true,
+        elapsedMinutes,
+        countdown: { d: 0, h: 0, m: 0, s: 0 },
+      };
+    }
+
+    // W przeciwnym razie bierzemy najbliższy nadchodzący mecz
+    const upcoming = scheduled.find(item => item.startDate.getTime() > now) || scheduled[scheduled.length - 1];
+    const diff = Math.max(0, upcoming.startDate.getTime() - now);
+
+    return {
+      fixture: upcoming.fixture,
+      roundNumber: 22 + upcoming.index,
+      startDate: upcoming.startDate,
+      isLive: false,
+      elapsedMinutes: 0,
+      countdown: {
+        d: Math.floor(diff / 86400000),
+        h: Math.floor((diff % 86400000) / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+      },
+    };
+  }, [fixtures, now]);
 }
 
 export function MatchScreen() {
-  const { d, h, m, s, done } = useCountdown(NEXT_MATCH_DATE);
+  const { fixture, roundNumber, isLive, elapsedMinutes, countdown } = useActiveMatch(FIXTURES);
+  const { d, h, m, s } = countdown;
+
   const [lineupOpen, setLineupOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
   const [standingsOpen, setStandingsOpen] = useState(false);
+
+  const opponentShort = getTeamShort(fixture.opponent);
+  const venueLabel = fixture.isHome ? 'Miejska Hala Lodowa, Nowy Targ' : `Wyjazd • ${fixture.opponent}`;
+  const timeLabel = fixture.time && fixture.time !== '—' ? `${fixture.date} - ${fixture.time}` : fixture.date;
 
   return (
     <div className="px-4 pt-3 pb-28 space-y-4">
@@ -49,8 +126,12 @@ export function MatchScreen() {
         <div className="absolute inset-0 shimmer-bg animate-shimmer pointer-events-none" />
         <div className="relative">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] uppercase tracking-widest text-gold-400 font-semibold">THL - Kolejka 22</span>
-            <span className="text-[10px] uppercase tracking-widest text-gray-400 flex items-center gap-1"><Radio className="w-3 h-3" /> 27.11 - 18:00</span>
+            <span className="text-[10px] uppercase tracking-widest text-gold-400 font-semibold">
+              THL - Kolejka {roundNumber}
+            </span>
+            <span className="text-[10px] uppercase tracking-widest text-gray-400 flex items-center gap-1">
+              <Radio className="w-3 h-3" /> {timeLabel}
+            </span>
           </div>
 
           <div className="flex items-center justify-between mb-5">
@@ -63,20 +144,22 @@ export function MatchScreen() {
             </div>
             <div className="px-3">
               <p className="font-display text-2xl text-gold-400">VS</p>
-              <p className="text-[9px] text-gray-500 uppercase mt-1">{done ? 'LIVE' : 'ZA CHWILE'}</p>
+              <p className="text-[9px] text-gray-500 uppercase mt-1">{isLive ? 'LIVE' : 'ZA CHWILE'}</p>
             </div>
             <div className="flex-1 text-center">
               <div className="w-16 h-16 mx-auto rounded-2xl glass border-red-400/20 flex items-center justify-center mb-2">
-                <span className="font-display text-xl text-red-300">PB</span>
+                <span className="font-display text-xl text-red-300">{opponentShort}</span>
               </div>
-              <p className="font-display text-sm uppercase text-white">Polonia</p>
-              <p className="text-[10px] text-gray-400">Bytom</p>
+              <p className="font-display text-sm uppercase text-white truncate">{fixture.opponent}</p>
+              <p className="text-[10px] text-gray-400">{fixture.isHome ? 'Gość' : 'Gospodarz'}</p>
             </div>
           </div>
 
           <div className="text-center mb-3">
-            <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider flex items-center justify-center gap-1"><MapPin className="w-3 h-3 text-gold-400" /> Miejska Hala Lodowa, Nowy Targ</p>
-            {!done ? (
+            <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider flex items-center justify-center gap-1">
+              <MapPin className="w-3 h-3 text-gold-400" /> {venueLabel}
+            </p>
+            {!isLive ? (
               <div className="flex items-center justify-center gap-2 tabular">
                 {[
                   { v: d, l: 'dni' },
@@ -93,7 +176,12 @@ export function MatchScreen() {
                 ))}
               </div>
             ) : (
-              <p className="text-2xl font-display text-red-400 animate-pulse">Mecz trwa</p>
+              <div className="space-y-1">
+                <p className="text-2xl font-display text-red-400 animate-pulse">Mecz trwa</p>
+                <p className="text-[11px] text-gray-300 tabular">
+                  Ok. {elapsedMinutes}. min od rozpoczęcia • Wynik na żywo w relacji / hali
+                </p>
+              </div>
             )}
           </div>
 
@@ -161,27 +249,30 @@ export function MatchScreen() {
       {/* Schedule Modal */}
       <Modal open={scheduleOpen} onClose={() => setScheduleOpen(false)} title="Terminarz 2026/27">
         <div className="p-3 space-y-2">
-          {FIXTURES.map((f) => (
-            <div key={f.id} className={`glass rounded-xl p-3 flex items-center gap-3 ${f.id === 'f1' ? 'ring-1 ring-gold-400/40' : ''}`}>
-              <div className="text-center shrink-0 w-12">
-                <p className="text-[11px] font-bold text-gold-400 tabular">{f.date}</p>
-                {f.time !== '-' && <p className="text-[9px] text-gray-500 tabular">{f.time}</p>}
+          {FIXTURES.map((f) => {
+            const isCurrent = f.id === fixture.id;
+            return (
+              <div key={f.id} className={`glass rounded-xl p-3 flex items-center gap-3 ${isCurrent ? 'ring-1 ring-gold-400/40' : ''}`}>
+                <div className="text-center shrink-0 w-12">
+                  <p className="text-[11px] font-bold text-gold-400 tabular">{f.date}</p>
+                  {f.time !== '-' && f.time !== '—' && <p className="text-[9px] text-gray-500 tabular">{f.time}</p>}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] text-white truncate">
+                    <span className={f.isHome ? 'font-semibold' : 'text-gray-300'}>{f.home}</span>
+                    <span className="text-gray-500 mx-1.5">-</span>
+                    <span className={!f.isHome ? 'font-semibold' : 'text-gray-300'}>{f.away}</span>
+                  </p>
+                  <p className="text-[9px] text-gray-500 mt-0.5">
+                    {f.isHome ? 'Dom' : 'Wyjazd'} {isCurrent ? '| Najbliższy mecz' : ''}
+                  </p>
+                </div>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${f.isHome ? 'bg-gold-400/15 text-gold-300' : 'bg-navy-400/15 text-navy-100'}`}>
+                  {f.isHome ? 'DOM' : 'WYJ'}
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[12px] text-white truncate">
-                  <span className={f.isHome ? 'font-semibold' : 'text-gray-300'}>{f.home}</span>
-                  <span className="text-gray-500 mx-1.5">-</span>
-                  <span className={!f.isHome ? 'font-semibold' : 'text-gray-300'}>{f.away}</span>
-                </p>
-                <p className="text-[9px] text-gray-500 mt-0.5">
-                  {f.isHome ? 'Dom' : 'Wyjazd'} | {f.id === 'f1' ? 'Najblizszy mecz' : ''}
-                </p>
-              </div>
-              <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${f.isHome ? 'bg-gold-400/15 text-gold-300' : 'bg-navy-400/15 text-navy-100'}`}>
-                {f.isHome ? 'DOM' : 'WYJ'}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Modal>
 

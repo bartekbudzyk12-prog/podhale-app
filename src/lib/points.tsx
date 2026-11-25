@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { ECONOMY } from './economy';
 
 interface PointsCtx {
   points: number;
@@ -9,7 +10,7 @@ interface PointsCtx {
 const Ctx = createContext<PointsCtx | null>(null);
 
 export function PointsProvider({ children }: { children: ReactNode }) {
-  const [points, setPoints] = useState(1450);
+  const [points, setPoints] = useState<number>(ECONOMY.startingBalance);
   const addPoints = (n: number) => setPoints(p => p + n);
   const spendPoints = (n: number) => {
     let ok = false;

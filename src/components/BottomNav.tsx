@@ -9,6 +9,7 @@ export type TabId =
   | 'konto'
   | 'hala'
   | 'druzyna'
+  | 'statystyki'
   | 'panel';
 
 interface Tab {

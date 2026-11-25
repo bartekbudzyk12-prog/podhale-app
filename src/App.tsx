@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { User, Building2, Users, Shield, ChevronRight, ArrowLeft } from 'lucide-react';
+import { User, Building2, Users, Shield, ChevronRight, ArrowLeft, BarChart3 } from 'lucide-react';
+import { StatsScreen } from './screens/StatsScreen';
 import { PointsProvider } from './lib/points';
 import { BottomNav, type TabId } from './components/BottomNav';
 import { PushBanner } from './components/PushBanner';
@@ -36,6 +37,12 @@ function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
       title: 'Drużyna',
       subtitle: 'Kadra zawodników i sztab Szarotek',
       icon: Users,
+    },
+    {
+      id: 'statystyki',
+      title: 'Statystyki',
+      subtitle: 'Gole, asysty, punkty, kary i +/- zawodników',
+      icon: BarChart3,
     },
     {
       id: 'panel',
@@ -86,7 +93,7 @@ export default function App() {
   const dismissPush = useCallback(() => setPush(null), []);
 
   const isSubScreen =
-    tab === 'konto' || tab === 'hala' || tab === 'druzyna' || tab === 'panel';
+    tab === 'konto' || tab === 'hala' || tab === 'druzyna' || tab === 'statystyki' || tab === 'panel';
 
   return (
     <PointsProvider>
@@ -123,6 +130,7 @@ export default function App() {
               {tab === 'konto' && <AccountSection />}
               {tab === 'hala' && <ClubHallSection />}
               {tab === 'druzyna' && <TeamScreen />}
+              {tab === 'statystyki' && <StatsScreen />}
               {tab === 'panel' && <AdminScreen pushHandler={setPush} />}
             </div>
           </div>

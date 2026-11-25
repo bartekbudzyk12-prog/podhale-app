@@ -109,7 +109,7 @@ export function AdminScreen({ pushHandler }: Props) {
       <div className="glass rounded-2xl p-4 space-y-3.5 border border-gold-400/20">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-sm uppercase tracking-wide text-white flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-red-400" /> Wynik na żywo
+            <Radio className="w-3.5 h-3.5 text-red-400"/> Wynik na żywo
           </h2>
           <button
             type="button"
@@ -134,7 +134,7 @@ export function AdminScreen({ pushHandler }: Props) {
                 className="w-8 h-8 rounded-full glass flex items-center justify-center active:scale-90 transition-transform"
                 aria-label="Odejmij gola Podhalu"
               >
-                <Minus className="w-3.5 h-3.5 text-white" />
+                <Minus className="w-3.5 h-3.5 text-white"/>
               </button>
               <span className="text-3xl font-display tabular text-white w-9 text-center">{liveScore.homeScore}</span>
               <button
@@ -143,7 +143,7 @@ export function AdminScreen({ pushHandler }: Props) {
                 className="w-8 h-8 rounded-full glass flex items-center justify-center active:scale-90 transition-transform"
                 aria-label="Dodaj gola Podhalu"
               >
-                <Plus className="w-3.5 h-3.5 text-white" />
+                <Plus className="w-3.5 h-3.5 text-white"/>
               </button>
             </div>
           </div>
@@ -159,7 +159,7 @@ export function AdminScreen({ pushHandler }: Props) {
                 className="w-8 h-8 rounded-full glass flex items-center justify-center active:scale-90 transition-transform"
                 aria-label="Odejmij gola rywalowi"
               >
-                <Minus className="w-3.5 h-3.5 text-white" />
+                <Minus className="w-3.5 h-3.5 text-white"/>
               </button>
               <span className="text-3xl font-display tabular text-white w-9 text-center">{liveScore.awayScore}</span>
               <button
@@ -168,7 +168,7 @@ export function AdminScreen({ pushHandler }: Props) {
                 className="w-8 h-8 rounded-full glass flex items-center justify-center active:scale-90 transition-transform"
                 aria-label="Dodaj gola rywalowi"
               >
-                <Plus className="w-3.5 h-3.5 text-white" />
+                <Plus className="w-3.5 h-3.5 text-white"/>
               </button>
             </div>
           </div>
@@ -203,39 +203,15 @@ export function AdminScreen({ pushHandler }: Props) {
             onClick={resetScore}
             className="inline-flex items-center gap-1 text-[10px] text-gray-400 hover:text-white underline"
           >
-            <RotateCcw className="w-3 h-3" /> Resetuj wynik
+            <RotateCcw className="w-3 h-3"/> Resetuj wynik
           </button>
         </div>
       </div>
 
       {/* Live metrics */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="glass rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-gold-400" />
-            <span className="text-[9px] uppercase tracking-widest text-gray-400 font-semibold">Na hali</span>
-          </div>
-          <p className="text-3xl font-display tabular text-white">1 840</p>
-          <p className="text-[10px] text-green-400 flex items-center gap-1 mt-1">
-            <Activity className="w-2.5 h-2.5" /> Aktywni kibice
-          </p>
-        </div>
-        <div className="glass rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Vote className="w-4 h-4 text-red-400" />
-            <span className="text-[9px] uppercase tracking-widest text-gray-400 font-semibold">Głosy MVP</span>
-          </div>
-          <p className="text-3xl font-display tabular text-white">942</p>
-          <p className="text-[10px] text-green-400 flex items-center gap-1 mt-1">
-            <TrendingUp className="w-2.5 h-2.5" /> +12% dziś
-          </p>
-        </div>
-      </div>
-
-      {/* Extra metrics */}
       <div className="glass rounded-2xl p-4 space-y-3">
         <h2 className="font-display text-sm uppercase tracking-wide text-white flex items-center gap-2">
-          <Zap className="w-3.5 h-3.5 text-gold-400" /> Metryki na żywo
+          <Zap className="w-3.5 h-3.5 text-gold-400"/> Metryki na żywo
         </h2>
         {[
           { label: 'Sprzedane bilety (dziś)', value: '3 250', pct: 87 },
@@ -258,7 +234,7 @@ export function AdminScreen({ pushHandler }: Props) {
       {/* Push simulator */}
       <div className="glass rounded-2xl p-4">
         <h2 className="font-display text-sm uppercase tracking-wide text-white flex items-center gap-2 mb-3">
-          <Bell className="w-3.5 h-3.5 text-gold-400" /> Wyślij Powiadomienie Push
+          <Bell className="w-3.5 h-3.5 text-gold-400"/> Wyślij Powiadomienie Push
         </h2>
 
         <div className="flex gap-2 mb-3">
@@ -271,8 +247,34 @@ export function AdminScreen({ pushHandler }: Props) {
             className="flex-1 bg-navy-600 border border-white/10 rounded-xl px-3.5 py-3 text-[13px] text-white placeholder-gray-500 focus:border-gold-400/50 outline-none"
           />
           <button
+            type="button"
             onClick={() => { sendPush(message); setMessage(''); }}
             disabled={!message.trim()}
             className="px-4 rounded-xl bg-gold-400 text-navy-900 font-bold active:scale-95 transition-transform disabled:opacity-40"
           >
-            <Send className="w-4 h-4"
+            <Send className="w-4 h-4"/>
+          </button>
+        </div>
+
+        <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Szablony</p>
+        <div className="space-y-2">
+          {PUSH_PRESETS.map((p, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => sendPush(p)}
+              className="w-full text-left glass rounded-xl px-3.5 py-2.5 flex items-center gap-2 active:scale-[0.98] transition-transform"
+            >
+              <Megaphone className="w-3.5 h-3.5 text-gold-400 shrink-0"/>
+              <span className="text-[12px] text-gray-200">{p}</span>
+            </button>
+          ))}
+        </div>
+
+        {sentCount > 0 && (
+          <p className="text-[11px] text-green-400 mt-3 text-center">Wysłano {sentCount} powiadomień push do kibiców</p>
+        )}
+      </div>
+    </div>
+  );
+}

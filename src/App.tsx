@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { User, Building2, Users, Shield, ChevronRight, ArrowLeft, BarChart3, Share2 } from 'lucide-react';
+import { User, Building2, Users, Shield, ChevronRight, ArrowLeft, BarChart3, Share2, RefreshCw } from 'lucide-react';
 import { StatsScreen } from './screens/StatsScreen';
 import { SocialMediaScreen } from './screens/SocialMediaScreen';
 import { PointsProvider } from './lib/points';
@@ -14,7 +14,27 @@ import { AdminScreen } from './screens/AdminScreen';
 import { ClubHallSection } from './components/ClubHallSection';
 import { AccountSection } from './components/AccountSection';
 
+async function forceReloadApp() {
+  try {
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+    }
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((reg) => reg.update()));
+    }
+  } catch {
+    // Ignoruj błędy dostępu do pamięci podręcznej w trybie prywatnym
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set('v', String(Date.now()));
+  window.location.replace(url.toString());
+}
+
 function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
+  const [reloading, setReloading] = useState(false);
+
   const items: {
     id: TabId;
     title: string;
@@ -59,13 +79,30 @@ function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
     },
   ];
 
+  const handleRefreshClick = async () => {
+    setReloading(true);
+    await forceReloadApp();
+  };
+
   return (
     <div className="space-y-4 pb-24">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight text-white">Więcej</h1>
-        <p className="text-xs text-white/60 mt-0.5">
-          Konto kibica, hala lodowa, zespół i narzędzia klubowe
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-white">Więcej</h1>
+          <p className="text-xs text-white/60 mt-0.5">
+            Konto kibica, hala lodowa, zespół i narzędzia klubowe
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleRefreshClick}
+          disabled={reloading}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gold-400 transition-colors shrink-0 disabled:opacity-60"
+          title="Wymuś pobranie najnowszej wersji aplikacji"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${reloading ? 'animate-spin' : ''}`} />
+          {reloading ? 'Odświeżam...' : 'Odśwież'}
+        </button>
       </div>
 
       <div className="space-y-2.5">

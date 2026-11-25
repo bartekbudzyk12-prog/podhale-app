@@ -8,6 +8,7 @@ import { QuizScreen } from './screens/QuizScreen';
 import { FanCardScreen } from './screens/FanCardScreen';
 import { TeamScreen } from './screens/TeamScreen';
 import { AdminScreen } from './screens/AdminScreen';
+import { ClubHallSection } from './components/ClubHallSection';
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('mecz');
@@ -30,12 +31,13 @@ export default function App() {
           {/* Content */}
           <div className="relative">
             {push && <PushBanner text={push} onDismiss={dismissPush} />}
-            <div className="pt-safe">
+            <div className="pt-safe px-3 pt-3">
               {tab === 'mecz' && <MatchScreen />}
               {tab === 'typer' && <FanZoneScreen />}
               {tab === 'quiz' && <QuizScreen />}
               {tab === 'karta' && <FanCardScreen />}
               {tab === 'druzyna' && <TeamScreen />}
+              {tab === 'hala' && <ClubHallSection />}
               {tab === 'panel' && <AdminScreen pushHandler={setPush} />}
             </div>
           </div>

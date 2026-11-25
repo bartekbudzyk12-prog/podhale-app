@@ -4,6 +4,7 @@ import { Badge } from '@/components/Badge';
 import { FanPoll } from '@/components/FanPoll';
 import { MVP_CANDIDATES, FIRST_GOAL_SCORERS } from '@/lib/data';
 import { usePoints } from '@/lib/points';
+import { ECONOMY } from '@/lib/economy';
 import { supabase } from '@/lib/supabase';
 
 interface VoteCounts {
@@ -41,9 +42,9 @@ export function FanZoneScreen() {
   const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0) || 1;
 
   const submitTyper = () => {
+    if (submitted) return;
     setSubmitted(true);
-    addPoints(150);
-    setTimeout(() => setSubmitted(false), 3000);
+    addPoints(ECONOMY.typerReward);
   };
 
   const castVote = async (id: string, name: string) => {
@@ -64,7 +65,7 @@ export function FanZoneScreen() {
         <div className="flex items-center gap-2 mb-4">
           <Trophy className="w-4 h-4 text-gold-400" />
           <h2 className="font-display text-base uppercase tracking-wide text-white">Typer Kibica</h2>
-          <Badge text="+150 Szarotek" color="gold" size="sm" />
+          <Badge text={`+${ECONOMY.typerReward} Szarotek`} color="gold" size="sm" />
         </div>
 
         <p className="text-[11px] text-gray-400 mb-3">Podhale NT vs Polonia Bytom • 27.11.2026</p>
@@ -118,7 +119,7 @@ export function FanZoneScreen() {
           className={`w-full py-3.5 rounded-xl font-bold transition-all active:scale-95 ${submitted ? 'bg-green-500 text-white' : 'bg-gold-400 text-navy-900 hover:bg-gold-300 glow-gold'}`}
         >
           {submitted ? (
-            <span className="flex items-center justify-center gap-2"><Check className="w-4 h-4" /> Typ wysłany! +150 Szarotek</span>
+            <span className="flex items-center justify-center gap-2"><Check className="w-4 h-4" /> Typ wysłany! +{ECONOMY.typerReward} Szarotek</span>
           ) : (
             <span className="flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" /> Wyślij typ</span>
           )}

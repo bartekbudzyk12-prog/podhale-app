@@ -151,9 +151,9 @@ export const NEWS = [
 ];
 
 export const REWARDS = [
-  { id: 'r1', cost: 500, title: 'Kawa lub herbata na hali gratis', icon: 'coffee' },
-  { id: 'r2', cost: 1500, title: 'Oficjalny szalik Szarotek -30%', icon: 'scarf' },
-  { id: 'r3', cost: 3000, title: 'Zdjęcie na lodzie z drużyną po meczu', icon: 'camera' },
+  { id: 'r1', cost: 2500, title: 'Kawa lub herbata na hali gratis', icon: 'coffee' },
+  { id: 'r2', cost: 6000, title: 'Oficjalny szalik Szarotek -30%', icon: 'scarf' },
+  { id: 'r3', cost: 15000, title: 'Zdjęcie na lodzie z drużyną po meczu', icon: 'camera' },
 ];
 
 export const PUSH_PRESETS = [
@@ -181,7 +181,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q2',
-    question: 'Jaką przydomką kibice nazywają drużynę Podhala?',
+    question: 'Jakim przydomkiem kibice nazywają drużynę Podhala?',
     options: ['Lwy', 'Szarotki', 'Orły', 'Górale'],
     correct: 1,
     explanation: 'Szarotki — od alpejskiego kwiatu, który rośnie w Tatrach, stąd przydomek drużyny.',
@@ -219,7 +219,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     question: 'Ilu zawodników z jednej drużyny przebywa na lodzie w trakcie gry?',
     options: ['5', '6', '7', '4'],
     correct: 1,
-    explanation: 'Na lodzie przebywa 6 zawodników: bramkarz, trzech obrońców i dwóch napastników — w grypie 5+1.',
+    explanation: 'Na lodzie przebywa 6 zawodników: bramkarz, dwóch obrońców i trzech napastników — w układzie 5+1.',
   },
   {
     id: 'q8',
@@ -233,7 +233,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     question: 'Który obrońca nosi numer 69 w sezonie 2026/27?',
     options: ['Horzelski Marcin', 'Zalamay Dmitri', 'Kamiński Łukasz', 'Weglarczyk Wiktor'],
     correct: 1,
-    explanation: 'Zalamay Dmitri, najpunkciejszy obrońca drużyny, gra z numerem 69.',
+    explanation: 'Zalamay Dmitri, jeden z najskuteczniejszych obrońców drużyny, gra z numerem 69.',
   },
   {
     id: 'q10',

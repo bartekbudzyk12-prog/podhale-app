@@ -15,6 +15,9 @@ const TABS: Tab[] = [
   { id: 'karta', label: 'Karta Kibica', icon: CreditCard },
   { id: 'druzyna', label: 'Drużyna', icon: Users },
   { id: 'panel', label: 'Panel Klubu', icon: Shield },
+  { id: 'panel', label: 'Panel Klubu', icon: Shield },
+  { id: 'hala', label: 'Hala', icon: Building2 },
+];
 ];
 
 interface Props {

@@ -18,7 +18,6 @@ const TABS: Tab[] = [
   { id: 'panel', label: 'Panel Klubu', icon: Shield },
   { id: 'hala', label: 'Hala', icon: Building2 },
 ];
-];
 
 interface Props {
   active: TabId;

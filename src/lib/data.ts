@@ -21,57 +21,55 @@ export const PLAYERS: Player[] = [
   { id: 'roberts', name: 'Roberts Ethan', number: 42, position: 'Bramkarz', age: 24, matches: 3, goals: 0, assists: 0, points: 0, pim: 0, rating: 75, nationality: 'Kanada', flag: '🇨🇦' },
   { id: 'zajac', name: 'Zając Kacper', number: 33, position: 'Bramkarz', age: 21, matches: 11, goals: 0, assists: 0, points: 0, pim: 0, rating: 76, nationality: 'Polska', flag: '🇵🇱' },
   // Obrońcy
-  { id: 'bochenski', name: 'Bochenski Kamil', number: 6, position: 'Obrońca', age: 17, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 68, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'bochenski', name: 'Bocheński Kamil', number: 6, position: 'Obrońca', age: 17, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 68, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'horzelski', name: 'Horzelski Marcin', number: 59, position: 'Obrońca', age: 30, matches: 19, goals: 2, assists: 4, points: 6, pim: 10, rating: 77, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'kaminski', name: 'Kamiński Łukasz', number: 15, position: 'Obrońca', age: 27, matches: 19, goals: 5, assists: 7, points: 12, pim: 14, rating: 80, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'kopytko', name: 'Kopytko Filip', number: 18, position: 'Obrońca', age: 19, matches: 4, goals: 0, assists: 0, points: 0, pim: 2, rating: 70, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'matera', name: 'Matera Jan', number: 8, position: 'Obrońca', age: 18, matches: 21, goals: 0, assists: 0, points: 0, pim: 6, rating: 72, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'matthews', name: 'Matthews Daryan', number: 23, position: 'Obrońca', age: 19, matches: 16, goals: 0, assists: 0, points: 0, pim: 8, rating: 73, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'mackowski_d', name: 'Maćkowski Szymon', number: 86, position: 'Obrońca', age: 23, matches: 3, goals: 0, assists: 0, points: 0, pim: 0, rating: 71, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'savchenko', name: 'Savchenko Arseni', number: 24, position: 'Obrońca', age: 19, matches: 3, goals: 0, assists: 1, points: 1, pim: 2, rating: 70, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'sitnik', name: 'Sitnik Ivan', number: 28, position: 'Obrońca', age: 20, matches: 9, goals: 0, assists: 0, points: 0, pim: 4, rating: 72, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'tanczyk', name: 'Tanczyk Wiktor', number: 61, position: 'Obrońca', age: 18, matches: 20, goals: 0, assists: 0, points: 0, pim: 6, rating: 73, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'weglarczyk', name: 'Weglarczyk Wiktor', number: 21, position: 'Obrońca', age: 19, matches: 18, goals: 1, assists: 0, points: 1, pim: 8, rating: 74, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'zalamay', name: 'Zalamay Dmitri', number: 69, position: 'Obrońca', age: 32, matches: 19, goals: 2, assists: 9, points: 11, pim: 12, rating: 79, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'savchenko', name: 'Sewczenko Arseni', number: 24, position: 'Obrońca', age: 19, matches: 3, goals: 0, assists: 1, points: 1, pim: 2, rating: 70, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'sitnik', name: 'Sitnik Iwan', number: 28, position: 'Obrońca', age: 20, matches: 9, goals: 0, assists: 0, points: 0, pim: 4, rating: 72, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'tanczyk', name: 'Tańczyk Wiktor', number: 61, position: 'Obrońca', age: 18, matches: 20, goals: 0, assists: 0, points: 0, pim: 6, rating: 73, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'weglarczyk', name: 'Węglarczyk Wiktor', number: 21, position: 'Obrońca', age: 19, matches: 18, goals: 1, assists: 0, points: 1, pim: 8, rating: 74, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'zalamay', name: 'Załamaj Dmitrij', number: 69, position: 'Obrońca', age: 32, matches: 19, goals: 2, assists: 9, points: 11, pim: 12, rating: 79, nationality: 'Polska', flag: '🇵🇱' },
   // Napastnicy
   { id: 'alanko', name: 'Alanko Roni', number: 29, position: 'Napastnik', age: 21, matches: 1, goals: 0, assists: 0, points: 0, pim: 0, rating: 68, nationality: 'Finlandia', flag: '🇫🇮' },
-  { id: 'blach', name: 'Blach Jan', number: 9, position: 'Napastnik', age: 19, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 69, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'blach', name: 'Błach Jan', number: 9, position: 'Napastnik', age: 19, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 69, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'bochnak', name: 'Bochnak Wiktor', number: 14, position: 'Napastnik', age: 24, matches: 17, goals: 2, assists: 5, points: 7, pim: 10, rating: 76, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'bryniarski', name: 'Bryniarski Daniel', number: 19, position: 'Napastnik', age: 20, matches: 14, goals: 0, assists: 1, points: 1, pim: 6, rating: 72, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'chyrkin', name: 'Chyrkin Uladzimir', number: 17, position: 'Napastnik', age: 19, matches: 10, goals: 0, assists: 0, points: 0, pim: 4, rating: 71, nationality: 'Białoruś', flag: '🇧🇾' },
-  { id: 'dlugopolski', name: 'Dlugopolski Łukasz', number: 18, position: 'Napastnik', age: 22, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 69, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'chyrkin', name: 'Chyrkin Uładzimir', number: 17, position: 'Napastnik', age: 19, matches: 10, goals: 0, assists: 0, points: 0, pim: 4, rating: 71, nationality: 'Białoruś', flag: '🇧🇾' },
+  { id: 'dlugopolski', name: 'Długopolski Łukasz', number: 18, position: 'Napastnik', age: 22, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 69, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'duda', name: 'Duda Eryk', number: 24, position: 'Napastnik', age: 16, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 67, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'gach', name: 'Gach Michał', number: 6, position: 'Napastnik', age: 20, matches: 1, goals: 0, assists: 0, points: 0, pim: 0, rating: 68, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'hu', name: 'Hu Sam', number: 67, position: 'Napastnik', age: 29, matches: 5, goals: 2, assists: 5, points: 7, pim: 4, rating: 75, nationality: 'Kanada', flag: '🇨🇦' },
   { id: 'jarczyk', name: 'Jarczyk Krzysztof', number: 93, position: 'Napastnik', age: 23, matches: 20, goals: 0, assists: 1, points: 1, pim: 8, rating: 73, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'kapica', name: 'Kapica Fabian', number: 91, position: 'Napastnik', age: 23, matches: 18, goals: 3, assists: 5, points: 8, pim: 10, rating: 77, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'kolendowicz', name: 'Kolendowicz Alex', number: 18, position: 'Napastnik', age: 18, matches: 2, goals: 0, assists: 0, points: 0, pim: 0, rating: 68, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'lojas', name: 'Lojas Dawid', number: 46, position: 'Napastnik', age: 20, matches: 21, goals: 1, assists: 1, points: 2, pim: 6, rating: 74, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'lojas', name: 'Łojas Dawid', number: 46, position: 'Napastnik', age: 20, matches: 21, goals: 1, assists: 1, points: 2, pim: 6, rating: 74, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'majoch', name: 'Majoch Dawid', number: 10, position: 'Napastnik', age: 33, matches: 20, goals: 2, assists: 1, points: 3, pim: 12, rating: 75, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'malasinski', name: 'Malasinski Kacper', number: 7, position: 'Napastnik', age: 22, matches: 20, goals: 0, assists: 1, points: 1, pim: 8, rating: 74, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'olifirchuk', name: 'Olifirchuk Danylo', number: 82, position: 'Napastnik', age: 18, matches: 21, goals: 2, assists: 4, points: 6, pim: 6, rating: 76, nationality: 'Ukraina', flag: '🇺🇦' },
-  { id: 'sadovsky', name: 'Sadovsky Alexander', number: 77, position: 'Napastnik', age: 20, matches: 11, goals: 1, assists: 0, points: 1, pim: 4, rating: 72, nationality: 'Słowacja', flag: '🇸🇰' },
+  { id: 'malasinski', name: 'Malasiński Kacper', number: 7, position: 'Napastnik', age: 22, matches: 20, goals: 0, assists: 1, points: 1, pim: 8, rating: 74, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'olifirchuk', name: 'Olifirczuk Danyło', number: 82, position: 'Napastnik', age: 18, matches: 21, goals: 2, assists: 4, points: 6, pim: 6, rating: 76, nationality: 'Ukraina', flag: '🇺🇦' },
+  { id: 'sadovsky', name: 'Sadouski Aliaksander', number: 77, position: 'Napastnik', age: 20, matches: 11, goals: 1, assists: 0, points: 1, pim: 4, rating: 72, nationality: 'Słowacja', flag: '🇸🇰' },
   { id: 'saroka', name: 'Saroka Marat', number: 77, position: 'Napastnik', age: 23, matches: 5, goals: 2, assists: 2, points: 4, pim: 4, rating: 74, nationality: 'Białoruś', flag: '🇧🇾' },
   { id: 'sroka', name: 'Sroka Marcin', number: 55, position: 'Napastnik', age: 19, matches: 11, goals: 0, assists: 1, points: 1, pim: 4, rating: 71, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'slowakiewicz', name: 'Słowakiewicz Adrian', number: 2, position: 'Napastnik', age: 27, matches: 21, goals: 5, assists: 1, points: 6, pim: 10, rating: 78, nationality: 'Polska', flag: '🇵🇱' },
   { id: 'worwa', name: 'Worwa Jakub', number: 12, position: 'Napastnik', age: 27, matches: 4, goals: 1, assists: 0, points: 1, pim: 2, rating: 75, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'wsol', name: 'Wsół Bartlomiej', number: 28, position: 'Napastnik', age: 26, matches: 3, goals: 0, assists: 0, points: 0, pim: 0, rating: 70, nationality: 'Polska', flag: '🇵🇱' },
-  { id: 'zoltek', name: 'Zoltek Szczepan', number: 87, position: 'Napastnik', age: 19, matches: 20, goals: 0, assists: 1, points: 1, pim: 4, rating: 72, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'wsol', name: 'Wsół Bartłomiej', number: 28, position: 'Napastnik', age: 26, matches: 3, goals: 0, assists: 0, points: 0, pim: 0, rating: 70, nationality: 'Polska', flag: '🇵🇱' },
+  { id: 'zoltek', name: 'Żółtek Szczepan', number: 87, position: 'Napastnik', age: 19, matches: 20, goals: 0, assists: 1, points: 1, pim: 4, rating: 72, nationality: 'Polska', flag: '🇵🇱' },
 ];
 
-export const MVP_CANDIDATES = [
-  { id: 'worwa', name: 'Worwa Jakub', role: '#12, Napastnik', number: 12, flag: '🇵🇱' },
-  { id: 'kaminski', name: 'Kamiński Łukasz', role: '#15, Obrońca', number: 15, flag: '🇵🇱' },
-  { id: 'zajac', name: 'Zając Kacper', role: '#33, Bramkarz', number: 33, flag: '🇵🇱' },
-];
+export const MVP_CANDIDATES = PLAYERS.map((p) => ({
+  id: p.id,
+  name: p.name,
+  role: `#${p.number}, ${p.position}`,
+  number: p.number,
+  flag: p.flag,
+}));
 
 export const FIRST_GOAL_SCORERS = [
-  'Worwa Jakub',
-  'Kapica Fabian',
-  'Słowakiewicz Adrian',
-  'Olifirchuk Danylo',
-  'Bochnak Wiktor',
-  'Hu Sam',
+  ...PLAYERS.map((p) => `#${p.number} ${p.name}`),
+  'Brak gola (0:0)',
 ];
 
 export interface Fixture {
@@ -86,7 +84,7 @@ export interface Fixture {
 
 export const FIXTURES: Fixture[] = [
   { id: 'f1', date: '27.11', time: '18:00', home: 'Podhale', away: 'Polonia Bytom', isHome: true, opponent: 'Polonia Bytom' },
-  { id: 'f2', date: '29.11', time: '—', home: 'Zagłębie Sosnowiec', away: 'Podhale', isHome: false, opponent: 'Zagłębie Sosnowiec' },
+  { id: 'f2', date: '29.11', time: '18:00', home: 'Zagłębie Sosnowiec', away: 'Podhale', isHome: false, opponent: 'Zagłębie Sosnowiec' },
   { id: 'f3', date: '01.12', time: '18:00', home: 'Podhale', away: 'Comarch Cracovia', isHome: true, opponent: 'Comarch Cracovia' },
   { id: 'f4', date: '04.12', time: '18:00', home: 'Unia Oświęcim', away: 'Podhale', isHome: false, opponent: 'Unia Oświęcim' },
   { id: 'f5', date: '06.12', time: '18:00', home: 'Podhale', away: 'STS Sanok', isHome: true, opponent: 'STS Sanok' },
@@ -196,7 +194,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q4',
     question: 'Kto jest najstarszym zawodnikiem w kadrze Szarotek 2026/27?',
-    options: ['Majoch Dawid (33)', 'Zalamay Dmitri (32)', 'Hu Sam (29)', 'Horzelski Marcin (30)'],
+    options: ['Majoch Dawid (33)', 'Załamaj Dmitrij (32)', 'Hu Sam (29)', 'Horzelski Marcin (30)'],
     correct: 0,
     explanation: 'Majoch Dawid, napastnik z numerem 10, ma 33 lata — najwięcej w składzie.',
   },
@@ -231,9 +229,9 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q9',
     question: 'Który obrońca nosi numer 69 w sezonie 2026/27?',
-    options: ['Horzelski Marcin', 'Zalamay Dmitri', 'Kamiński Łukasz', 'Weglarczyk Wiktor'],
+    options: ['Horzelski Marcin', 'Załamaj Dmitrij', 'Kamiński Łukasz', 'Węglarczyk Wiktor'],
     correct: 1,
-    explanation: 'Zalamay Dmitri, jeden z najskuteczniejszych obrońców drużyny, gra z numerem 69.',
+    explanation: 'Załamaj Dmitrij, jeden z najskuteczniejszych obrońców drużyny, gra z numerem 69.',
   },
   {
     id: 'q10',
@@ -279,7 +277,7 @@ export const POLLS: Poll[] = [
 ];
 
 export function positionShort(pos: Player['position']): string {
-  return { 'Bramkarz': 'B', 'Obrońca': 'O', 'Napastnik': 'N' }[pos];
+  return { Bramkarz: 'B', Obrońca: 'O', Napastnik: 'N' }[pos];
 }
 
 export const TICKET_URL = 'https://biletynahokej.pl/';

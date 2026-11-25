@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { User, Building2, Users, Shield, ChevronRight, ArrowLeft, BarChart3, Share2, RefreshCw } from 'lucide-react';
 import { StatsScreen } from './screens/StatsScreen';
 import { SocialMediaScreen } from './screens/SocialMediaScreen';
@@ -10,7 +10,7 @@ import { FanZoneScreen } from './screens/FanZoneScreen';
 import { QuizScreen } from './screens/QuizScreen';
 import { FanCardScreen } from './screens/FanCardScreen';
 import { TeamScreen } from './screens/TeamScreen';
-import { AdminScreen } from './screens/AdminScreen';
+import { AdminScreen, type LiveScoreState, DEFAULT_LIVE_SCORE, readLiveScore, writeLiveScore } from './screens/AdminScreen';
 import { ClubHallSection } from './components/ClubHallSection';
 import { AccountSection } from './components/AccountSection';
 
@@ -25,7 +25,7 @@ async function forceReloadApp() {
       await Promise.all(regs.map((reg) => reg.update()));
     }
   } catch {
-    // Ignoruj błędy dostępu do pamięci podręcznej w trybie prywatnym
+    // Ignoruj błędy dostępu do pamięci podręcznej
   }
   const url = new URL(window.location.href);
   url.searchParams.set('v', String(Date.now()));
@@ -133,6 +133,36 @@ function MoreMenu({ onSelect }: { onSelect: (tab: TabId) => void }) {
 export default function App() {
   const [tab, setTab] = useState<TabId>('mecz');
   const [push, setPush] = useState<string | null>(null);
+  const [liveScore, setLiveScore] = useState<LiveScoreState>(() => readLiveScore());
+
+  useEffect(() => {
+    const sync = () => setLiveScore(readLiveScore());
+    window.addEventListener('podhale-live-score-change', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('podhale-live-score-change', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+
+  const updateLiveScore = useCallback((patch: Partial<LiveScoreState>) => {
+    setLiveScore((prev) => {
+      const next: LiveScoreState = {
+        ...prev,
+        ...patch,
+        active: patch.active !== undefined ? patch.active : true,
+        updatedAt: Date.now(),
+      };
+      writeLiveScore(next);
+      return next;
+    });
+  }, []);
+
+  const resetLiveScore = useCallback(() => {
+    const next: LiveScoreState = { ...DEFAULT_LIVE_SCORE, updatedAt: Date.now() };
+    writeLiveScore(next);
+    setLiveScore(next);
+  }, []);
 
   const dismissPush = useCallback(() => setPush(null), []);
 
@@ -142,16 +172,13 @@ export default function App() {
   return (
     <PointsProvider>
       <div className="min-h-screen bg-navy-900 flex justify-center text-white">
-        {/* Desktop frame */}
         <div className="relative w-full max-w-[430px] min-h-screen bg-navy-700 shadow-2xl overflow-x-hidden sm:border-x border-white/5">
-          {/* Ambient background glow */}
           <div className="fixed inset-0 pointer-events-none max-w-[430px] mx-auto">
             <div className="absolute top-0 left-0 w-72 h-72 bg-gold-400/5 rounded-full blur-[100px]" />
             <div className="absolute bottom-20 right-0 w-72 h-72 bg-red-400/5 rounded-full blur-[100px]" />
             <div className="absolute top-1/3 right-0 w-60 h-60 bg-navy-400/10 rounded-full blur-[80px]" />
           </div>
 
-          {/* Content */}
           <div className="relative">
             {push && <PushBanner text={push} onDismiss={dismissPush} />}
             <div className="pt-safe px-3 pt-3 pb-20">
@@ -166,7 +193,7 @@ export default function App() {
                 </button>
               )}
 
-              {tab === 'mecz' && <MatchScreen />}
+              {tab === 'mecz' && <MatchScreen liveScore={liveScore} />}
               {tab === 'typer' && <FanZoneScreen />}
               {tab === 'quiz' && <QuizScreen />}
               {tab === 'karta' && <FanCardScreen />}
@@ -176,7 +203,14 @@ export default function App() {
               {tab === 'druzyna' && <TeamScreen />}
               {tab === 'statystyki' && <StatsScreen />}
               {tab === 'social' && <SocialMediaScreen />}
-              {tab === 'panel' && <AdminScreen pushHandler={setPush} />}
+              {tab === 'panel' && (
+                <AdminScreen
+                  pushHandler={setPush}
+                  liveScore={liveScore}
+                  onUpdateLiveScore={updateLiveScore}
+                  onResetLiveScore={resetLiveScore}
+                />
+              )}
             </div>
           </div>
 
